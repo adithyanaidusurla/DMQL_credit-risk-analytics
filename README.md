@@ -13,7 +13,7 @@ The project uses the following datasets (all CSV files stored in `data/`):
 - `previous_application.csv` – Historical loan data  
 - `installments_payments.csv` – Installment payments for previous loans
 
-- [Find and download the dataset in this link] (https://buffalo.box.com/s/z3wlswzqif58vksdiaixkogzhdkzb7w9) 
+- [Find and download the dataset in this link](https://buffalo.box.com/s/z3wlswzqif58vksdiaixkogzhdkzb7w9) 
 
 ---
 
