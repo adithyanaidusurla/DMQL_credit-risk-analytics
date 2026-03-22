@@ -38,8 +38,6 @@ The database is normalized to **Third Normal Form (3NF)** to:
 - One-to-many between Borrowers → Employment, Loan Applications, Bureau Records, Previous Loans  
 - One-to-many between Previous Loans → Installments  
 
-![ERD](docs/ERD.png)
-
 ---
 
 ## Project Structure
