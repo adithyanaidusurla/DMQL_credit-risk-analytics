@@ -11,7 +11,9 @@ The project uses the following datasets (all CSV files stored in `data/`):
 - `application_train.csv` – Borrower demographic and financial data  
 - `bureau.csv` – Credit bureau records  
 - `previous_application.csv` – Historical loan data  
-- `installments_payments.csv` – Installment payments for previous loans  
+- `installments_payments.csv` – Installment payments for previous loans
+
+- [Find and download the dataset in this link] (https://buffalo.box.com/s/z3wlswzqif58vksdiaixkogzhdkzb7w9) 
 
 ---
 
