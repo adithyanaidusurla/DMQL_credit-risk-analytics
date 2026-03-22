@@ -124,3 +124,5 @@ An unlisted YouTube video demonstrates:
 ERD walkthrough
 Database tables in Neon
 Running the ingestion script successfully
+
+[Watch the demo](https://youtu.be/IVqARN8tUk8)
