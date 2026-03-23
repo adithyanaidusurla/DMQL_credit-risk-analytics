@@ -22,7 +22,9 @@ The database is normalized to **Third Normal Form (3NF)** to:
 
 - Eliminate redundancy  
 - Avoid update, insert, and delete anomalies  
-- Support secure and efficient data ingestion  
+- Support secure and efficient data ingestion
+
+![ERD](docs/ERD.png)
 
 ### Entities
 
