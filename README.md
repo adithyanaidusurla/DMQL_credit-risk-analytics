@@ -1,35 +1,54 @@
 # Credit Risk Analytics Database
 
 ## Project Overview
-This project ingests and models raw credit risk datasets into a **normalized PostgreSQL database** hosted on Neon. The database is designed to support analytics, reporting, and data-driven decision-making for credit risk assessment.
+
+This project ingests and models raw credit risk datasets into a **normalized PostgreSQL database** hosted on Neon and builds an analytics layer using **dbt (Data Build Tool)** for reporting, testing, and performance optimization.
+
+The system supports:
+
+- Secure and scalable PostgreSQL data storage
+- Automated data ingestion using Python + SQLAlchemy
+- OLTP schema in Third Normal Form (3NF)
+- Analytics-ready Star Schema using dbt
+- Data quality testing using dbt tests
+- CI/CD with GitHub Actions + SQLFluff
+- Advanced analytical SQL queries with performance tuning
 
 ---
 
 ## Dataset
+
 The project uses the following datasets (all CSV files stored in `data/`):
 
-- `application_train.csv` – Borrower demographic and financial data  
-- `bureau.csv` – Credit bureau records  
-- `previous_application.csv` – Historical loan data  
+- `application_train.csv` – Borrower demographic and financial data
+- `bureau.csv` – Credit bureau records
+- `previous_application.csv` – Historical loan data
 - `installments_payments.csv` – Installment payments for previous loans
 
-- [Find and download the dataset in this link](https://buffalo.box.com/s/z3wlswzqif58vksdiaixkogzhdkzb7w9) 
+- [Find and download the dataset in this link](https://buffalo.box.com/s/z3wlswzqif58vksdiaixkogzhdkzb7w9)
 
 ---
 
-## Database Design
+# Phase 1 — OLTP Database Design
+
+## Database Design (3NF)
+
 The database is normalized to **Third Normal Form (3NF)** to:
 
-- Eliminate redundancy  
-- Avoid update, insert, and delete anomalies  
+- Eliminate redundancy
+- Avoid update, insert, and delete anomalies
 - Support secure and efficient data ingestion
 
-![ERD](docs/ERD.png)
+## Entity Relationship Diagram (ERD)
 
-### Entities
+![Database Design ERD](docs/ERD.png)
+
+---
+
+## Entities
 
 | Table | Description |
-|-------|-------------|
+|---|---|
 | `borrowers` | Stores borrower demographic and financial information |
 | `employment` | Employment details for borrowers |
 | `loan_applications` | New loan requests |
@@ -37,96 +56,95 @@ The database is normalized to **Third Normal Form (3NF)** to:
 | `previous_loans` | Historical loans of borrowers |
 | `installments` | Installment payments for previous loans |
 
-**Relationships:**
+## Relationships
 
-- One-to-many between Borrowers → Employment, Loan Applications, Bureau Records, Previous Loans  
-- One-to-many between Previous Loans → Installments  
-
----
-
-## Project Structure
-
-DMQL_credit-risk-analytics/
-│
-├── data/ # Raw CSV datasets
-├── docs/ # Documentation and ERD
-├── scripts/ # Python ETL scripts
-│ └── ingest_data.py
-├── sql/ # Database schema and security
-│ ├── schema.sql
-│ └── security.sql
-├── README.md # Project overview
-├── venv/ # Python virtual environment (gitignored)
-└── .gitignore # Ignore venv, data dumps, etc.
-
-
+- One-to-many between Borrowers → Employment
+- One-to-many between Borrowers → Loan Applications
+- One-to-many between Borrowers → Bureau Records
+- One-to-many between Borrowers → Previous Loans
+- One-to-many between Previous Loans → Installments
 
 ---
 
-## Setup Instructions
+# Phase 2 — Analytics Layer with dbt
 
-### 1. Environment
+## Star Schema Design
 
-1. Create a Python virtual environment:
+A separate analytics layer was built using **dbt** to transform the OLTP schema into an optimized **Star Schema** for reporting and advanced SQL analysis.
 
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+### Central Fact Table
 
+### `fact_loan_applications`
 
-2. Set your Neon database URL:
+This table stores:
 
-export DATABASE_URL="postgresql://<user>:<password>@<host>/<dbname>?sslmode=require&channel_binding=require"
+- loan application outcomes
+- borrower financial profile
+- credit exposure
+- previous loan history
+- employment features
 
+### Dimension Tables
 
+- `dim_borrowers`
+- `dim_employment`
+- `dim_credit_profile`
+- `dim_previous_loan_summary`
 
-### 2. Provision Database
-1. Create tables:
-psql "$DATABASE_URL" -f sql/schema.sql
+---
 
-2. Set up RBAC roles:
-psql "$DATABASE_URL" -f sql/security.sql
+## Star Schema Diagram
 
-RBAC in this project:
-.Analyst: Read-only (SELECT)
-.App User: Read + write (SELECT, INSERT, UPDATE)
+![Star Schema](docs/star_schema.png)
 
-3. Data Ingestion
-Run the Python ETL script:
-python scripts/ingest_data.py
+---
 
-Features:
-Cleans and transforms CSV data
-Loads tables in correct order to satisfy foreign keys
-Handles missing values and incorrect types
-Idempotent: running multiple times does not duplicate data
+## dbt Features Implemented
 
-4. Resource Management
-SQLAlchemy connection pooling configured to conserve Neon free-tier Compute Units (CU)
+### Staging Layer
 
-engine = create_engine(
-    DATABASE_URL,
-    pool_size=2,
-    max_overflow=1,
-    pool_pre_ping=True,
-    pool_recycle=300
-)
+Created dbt staging models for:
 
-Neon automatically pauses after 5 minutes of inactivity
-Script runs in batches to minimize idle connections
+- stg_borrowers
+- stg_employment
+- stg_loan_applications
+- stg_bureau_records
+- stg_previous_loans
+- stg_installments
 
+### Marts Layer
 
-### 3NF Justification
-Database normalized to Third Normal Form (3NF)
-Tables contain attributes fully dependent on their primary keys
-Eliminates redundancy and prevents anomalies
-Separate tables for employment, previous loans, and installments maintain clean relationships
+Created final analytics tables:
 
+- fact_loan_applications
+- dim_borrowers
+- dim_employment
+- dim_credit_profile
+- dim_previous_loan_summary
 
-### Demo Video
-An unlisted YouTube video demonstrates:
-ERD walkthrough
-Database tables in Neon
-Running the ingestion script successfully
+### dbt Tests
 
-[Watch the demo](https://youtu.be/IVqARN8tUk8)
+Implemented:
+
+- `unique`
+- `not_null`
+- `relationships`
+
+All tests passed successfully.
+
+### dbt Docs
+
+Generated dbt documentation with:
+
+- model lineage graph
+- model catalog
+- dependency visualization
+
+---
+
+## CI/CD Automation
+
+Implemented GitHub Actions workflow:
+
+```text
+.github/workflows/ci.yml
