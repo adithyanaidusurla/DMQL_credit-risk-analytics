@@ -1,0 +1,30 @@
+[0m20:33:31.682936 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000150E4A79410>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000150E4A72C90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000150E4A73990>]}
+
+
+============================== 20:33:31.688925 | 1d91b5ae-64fa-4cf1-8d85-4327bee4b222 ==============================
+[0m20:33:31.688925 [info ] [MainThread]: Running with dbt=1.11.8
+[0m20:33:31.689909 [debug] [MainThread]: running dbt with arguments {'static_parser': 'True', 'no_print': 'None', 'version_check': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'target_path': 'None', 'printer_width': '80', 'write_json': 'True', 'empty': 'None', 'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'fail_fast': 'False', 'debug': 'False', 'log_format': 'default', 'profiles_dir': 'C:\\Users\\madha\\.dbt', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'invocation_command': 'dbt init dbt_credit_risk', 'indirect_selection': 'eager', 'use_colors': 'True', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m20:33:31.716998 [info ] [MainThread]: Creating dbt configuration folder at C:\Users\madha\.dbt
+[0m20:33:31.720294 [debug] [MainThread]: Starter project path: C:\Users\madha\Desktop\DMQL\Project\DMQL_credit-risk-analytics\venv\Lib\site-packages\dbt\include\starter_project
+[0m20:33:31.830623 [info ] [MainThread]: 
+Your new dbt project "dbt_credit_risk" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m20:33:31.830623 [info ] [MainThread]: Setting up your profile.
+[0m20:45:36.112681 [info ] [MainThread]: Profile dbt_credit_risk written to C:\Users\madha\.dbt\profiles.yml using target's profile_template.yml and your supplied values. Run 'dbt debug' to validate the connection.
+[0m20:45:36.114687 [debug] [MainThread]: Command `dbt init` succeeded at 20:45:36.114687 after 724.52 seconds
+[0m20:45:36.116676 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000150DDD59590>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000150E3B42E10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000150DDABB050>]}
+[0m20:45:36.117678 [debug] [MainThread]: Flushing usage events
+[0m20:45:36.551376 [debug] [MainThread]: An error was encountered while trying to flush usage events

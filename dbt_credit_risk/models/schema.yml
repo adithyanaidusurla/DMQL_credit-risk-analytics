@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: dim_borrowers
+    description: Borrower dimension table for analytics.
+    columns:
+      - name: borrower_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_employment
+    description: Employment dimension table.
+    columns:
+      - name: borrower_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_credit_profile
+    description: Aggregated bureau-based credit profile by borrower.
+    columns:
+      - name: borrower_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_previous_loan_summary
+    description: Aggregated summary of previous loans by borrower.
+    columns:
+      - name: borrower_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fact_loan_applications
+    description: Fact table for loan applications enriched with borrower and credit features.
+    columns:
+      - name: application_id
+        tests:
+          - unique
+          - not_null
+
+      - name: borrower_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_borrowers')
+                field: borrower_id

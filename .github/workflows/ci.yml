@@ -1,0 +1,54 @@
+name: dbt CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  dbt-ci:
+    runs-on: ubuntu-latest
+
+    env:
+      DBT_PROFILES_DIR: ${{ github.workspace }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install dbt-postgres sqlfluff sqlfluff-templater-dbt
+
+      - name: Create profiles.yml for dbt
+        run: |
+          cat > profiles.yml <<EOF
+          dbt_credit_risk:
+            target: dev
+            outputs:
+              dev:
+                type: postgres
+                host: ${{ secrets.DBT_HOST }}
+                user: ${{ secrets.DBT_USER }}
+                password: "${{ secrets.DBT_PASSWORD }}"
+                port: 5432
+                dbname: ${{ secrets.DBT_DBNAME }}
+                schema: analytics
+                threads: 1
+                sslmode: require
+          EOF
+
+      - name: Lint dbt SQL with SQLFluff
+        run: |
+          sqlfluff lint dbt_credit_risk/models --dialect postgres
+
+      - name: Run dbt tests
+        working-directory: dbt_credit_risk
+        run: |
+          dbt debug
+          dbt test

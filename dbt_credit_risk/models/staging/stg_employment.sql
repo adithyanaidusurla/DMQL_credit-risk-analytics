@@ -1,0 +1,5 @@
+select
+    borrower_id,
+    occupation_type,
+    years_employed
+from public.employment
