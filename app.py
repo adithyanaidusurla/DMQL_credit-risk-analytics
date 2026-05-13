@@ -246,35 +246,42 @@ def load_payment_behavior():
 def load_loan_distribution(gender_filter, education_filter, income_min, income_max):
     """Filtered loan amount distribution for interactive widget."""
     engine = get_engine()
+
     params = {
         "income_min": income_min,
         "income_max": income_max,
     }
+
     gender_clause = ""
     if gender_filter != "All":
-        gender_clause = "AND gender = :gender"
+        gender_clause = "AND b.gender = :gender"
         params["gender"] = gender_filter
 
     education_clause = ""
     if education_filter != "All":
-        education_clause = "AND education = :education"
+        education_clause = "AND b.education = :education"
         params["education"] = education_filter
 
     with engine.connect() as conn:
         df = pd.read_sql(text(f"""
             SELECT
-                loan_amount,
-                target,
-                income,
-                occupation_type,
-                years_employed
-            FROM analytics.fact_loan_applications
-            WHERE income BETWEEN :income_min AND :income_max
+                f.loan_amount,
+                f.target,
+                f.income,
+                f.occupation_type,
+                f.years_employed,
+                b.gender,
+                b.education
+            FROM analytics.fact_loan_applications f
+            LEFT JOIN analytics.dim_borrowers b
+                ON f.borrower_id = b.borrower_id
+            WHERE f.income BETWEEN :income_min AND :income_max
             {gender_clause}
             {education_clause}
-            AND loan_amount IS NOT NULL
+            AND f.loan_amount IS NOT NULL
             LIMIT 5000
         """), conn, params=params)
+
     return df
 
 
