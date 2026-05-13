@@ -417,7 +417,11 @@ def render_overview():
 
     # ── Interactive: Loan Distribution ──
     st.markdown('<div class="section-header">Loan Amount Distribution · Interactive Explorer</div>', unsafe_allow_html=True)
-    st.caption(f"Showing: Gender = **{gender_filter}** · Education = **{education_filter}** · Income = **${income_range[0]:,}** – **${income_range[1]:,}**")
+    st.caption(
+    f"Showing: Gender = {gender_filter} · "
+    f"Education = {education_filter} · "
+    f"Income = ${income_range[0]:,} – ${income_range[1]:,}"
+)
 
     dist_df = load_loan_distribution(gender_filter, education_filter, income_range[0], income_range[1])
 
