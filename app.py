@@ -567,14 +567,27 @@ def render_payment_behavior():
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown('<div class="section-header">Days Late Distribution</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-header">Days Late Distribution</div>',
+        unsafe_allow_html=True
+    )
+
+    late_df = df[df["days_late"].notnull()].copy()
+
+    if late_df.empty:
+        st.warning("No payment lateness data available.")
+    else:
         fig = px.histogram(
-            df[df["days_late"] > 0],
+            late_df,
             x="days_late",
             nbins=50,
             color_discrete_sequence=["#f59e0b"],
-            labels={"days_late": "Days Late", "count": "Count"},
+            labels={
+                "days_late": "Days Late",
+                "count": "Count"
+            },
         )
+
         fig.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
@@ -584,6 +597,7 @@ def render_payment_behavior():
             xaxis=dict(gridcolor="#1e2535"),
             yaxis=dict(gridcolor="#1e2535"),
         )
+
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
