@@ -205,11 +205,27 @@ def load_top_risky_borrowers():
 
 
 @st.cache_data(ttl=300)
-def load_payment_behavior():
-    """Payment behavior analysis (Query 3)."""
+def load_payment_behavior(gender_filter, education_filter, income_min, income_max):
+
     engine = get_engine()
+
+    params = {
+        "income_min": income_min,
+        "income_max": income_max,
+    }
+
+    gender_clause = ""
+    if gender_filter != "All":
+        gender_clause = "AND b.gender = :gender"
+        params["gender"] = gender_filter
+
+    education_clause = ""
+    if education_filter != "All":
+        education_clause = "AND b.education = :education"
+        params["education"] = education_filter
+
     with engine.connect() as conn:
-        df = pd.read_sql(text("""
+        df = pd.read_sql(text(f"""
             WITH installment_summary AS (
                 SELECT
                     pl.borrower_id,
@@ -217,30 +233,58 @@ def load_payment_behavior():
                     i.installment_amount,
                     i.payment_amount,
                     i.days_late,
-                    AVG(i.days_late) OVER (PARTITION BY pl.borrower_id) AS avg_days_late_per_borrower,
+                    AVG(i.days_late) OVER (
+                        PARTITION BY pl.borrower_id
+                    ) AS avg_days_late_per_borrower,
+
                     ROW_NUMBER() OVER (
                         PARTITION BY pl.borrower_id
                         ORDER BY i.days_late DESC
                     ) AS lateness_rank
+
                 FROM analytics.stg_installments i
+
                 JOIN analytics.stg_previous_loans pl
                     ON i.previous_loan_id = pl.previous_loan_id
+
+                LEFT JOIN analytics.dim_borrowers b
+                    ON pl.borrower_id = b.borrower_id
+
+                LEFT JOIN analytics.fact_loan_applications f
+                    ON pl.borrower_id = f.borrower_id
+
+                WHERE f.income BETWEEN :income_min AND :income_max
+                {gender_clause}
+                {education_clause}
             )
+
             SELECT
                 borrower_id,
                 previous_loan_id,
-                ROUND(installment_amount::numeric, 2) AS installment_amount,
-                ROUND(payment_amount::numeric, 2)     AS payment_amount,
-                days_late,
-                ROUND(avg_days_late_per_borrower::numeric, 2) AS avg_days_late,
-                lateness_rank
-            FROM installment_summary
-            WHERE lateness_rank <= 3
-            ORDER BY days_late DESC
-            LIMIT 500
-        """), conn)
-    return df
 
+                ROUND(installment_amount::numeric, 2)
+                    AS installment_amount,
+
+                ROUND(payment_amount::numeric, 2)
+                    AS payment_amount,
+
+                days_late,
+
+                ROUND(avg_days_late_per_borrower::numeric, 2)
+                    AS avg_days_late,
+
+                lateness_rank
+
+            FROM installment_summary
+
+            WHERE lateness_rank <= 3
+
+            ORDER BY days_late DESC
+
+            LIMIT 500
+        """), conn, params=params)
+
+    return df
 
 @st.cache_data(ttl=300)
 def load_loan_distribution(gender_filter, education_filter, income_min, income_max):
@@ -558,7 +602,10 @@ def render_payment_behavior():
     st.markdown('<div class="page-title">Payment Behavior Analysis</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-subtitle">Installment lateness patterns · Top late payments per borrower</div>', unsafe_allow_html=True)
 
-    df = load_payment_behavior()
+    df = load_payment_behavior(gender_filter,
+    education_filter,
+    income_range[0],
+    income_range[1])
 
     if df.empty:
         st.warning("No payment behavior data available.")
