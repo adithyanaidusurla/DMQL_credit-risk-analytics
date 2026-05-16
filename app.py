@@ -567,38 +567,38 @@ def render_payment_behavior():
     col1, col2 = st.columns(2)
 
     with col1:
-    st.markdown(
-        '<div class="section-header">Days Late Distribution</div>',
-        unsafe_allow_html=True
-    )
-
-    late_df = df[df["days_late"].notnull()].copy()
-
-    if late_df.empty:
-        st.warning("No payment lateness data available.")
-    else:
-        fig = px.histogram(
-            late_df,
-            x="days_late",
-            nbins=50,
-            color_discrete_sequence=["#f59e0b"],
-            labels={
-                "days_late": "Days Late",
-                "count": "Count"
-            },
+        st.markdown(
+            '<div class="section-header">Days Late Distribution</div>',
+            unsafe_allow_html=True
         )
 
-        fig.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font_color="#94a3b8",
-            margin=dict(l=10, r=10, t=10, b=10),
-            height=300,
-            xaxis=dict(gridcolor="#1e2535"),
-            yaxis=dict(gridcolor="#1e2535"),
-        )
+        late_df = df[df["days_late"].notnull()].copy()
 
-        st.plotly_chart(fig, use_container_width=True)
+        if late_df.empty:
+            st.warning("No payment lateness data available.")
+        else:
+            fig = px.histogram(
+                late_df,
+                x="days_late",
+                nbins=50,
+                color_discrete_sequence=["#f59e0b"],
+                labels={
+                    "days_late": "Days Late",
+                    "count": "Count"
+                },
+            )
+
+            fig.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font_color="#94a3b8",
+                margin=dict(l=10, r=10, t=10, b=10),
+                height=300,
+                xaxis=dict(gridcolor="#1e2535"),
+                yaxis=dict(gridcolor="#1e2535"),
+            )
+
+            st.plotly_chart(fig, use_container_width=True)
 
     with col2:
         st.markdown('<div class="section-header">Installment Amount vs Payment Amount</div>', unsafe_allow_html=True)
